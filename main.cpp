@@ -2,56 +2,105 @@
 
 using namespace std;
 
+string read_message() {
+    string s;
+    getline(cin, s);
+    return s;
+}
+
+bool check_string(string& s) {
+    for (int i = 0; i < s.size(); i++) {
+        if (s[i] == ' ') {
+            s.erase(s.begin() + i);
+            i--;
+        }
+    }
+    for (int i = 0; i < s.size(); i++) {
+        if (s[i] != '0' && s[i] != '1') {
+            return 0;
+        }
+    }
+
+    if (s.length() > 7 || s.length() < 7) {
+        return 0;
+    }
+    return 1;
+}
+
+void wrong_par_bit(int bit_index, vector<int>& par_arr) {
+    cout << bit_index << " parity bit is wrong\n";
+    cout << bit_index << " parity bit is equal to " << par_arr[bit_index] << endl;
+    cout << "this bit must be equal " << !par_arr[bit_index] << endl;
+}
+
+void wrong_inf_bit(int bit_index, vector<int>& inf_arr) {
+    cout << bit_index << " information bit is wrong\n";
+    cout << bit_index << " information bit is equal to " << inf_arr[bit_index] << endl;
+    cout << "this bit must be equal " << !inf_arr[bit_index] << endl;
+}
+
 int main()
 {
     int n;
-    vector<int> r, inf, v;
+    vector<int> par_bits, inf_bits, message;
 
-    for (int i = 0; i < 7; i++) {
-        char t;
-        cin >> t;
-        int a = int(t - '0');
-        double p = log2(i + 1);
-        if (p == ceil(p))
-            r.push_back(a);
-        else {
-            inf.push_back(a);
-        }
-        v.push_back(a);
+    string mes;
+
+    //Считываем правильную строку
+
+    getline(cin, mes);
+
+    while (!check_string(mes)) {
+        cout << "Wrong message\nTry again: ";
+        mes = read_message();
+        cout << '\n';
     }
 
-    int s1 = r[0] ^ inf[0] ^ inf[1] ^ inf[3];
-    int s2 = r[1] ^ inf[0] ^ inf[2] ^ inf[3];
-    int s3 = r[2] ^ inf[1] ^ inf[2] ^ inf[3];
+    for (int i = 0; i < mes.size(); i++) {
+        int number = int(mes[i] - '0');
+
+        double check_par_bit = log2(i + 1);
+
+        if (check_par_bit == ceil(check_par_bit))
+            par_bits.push_back(number);
+        else {
+            inf_bits.push_back(number);
+        }
+
+        message.push_back(number);
+    }
+
+    // Считаем синдромы
+
+    int syndrome1 = par_bits[0] ^ inf_bits[0] ^ inf_bits[1] ^ inf_bits[3];
+    int syndrome2 = par_bits[1] ^ inf_bits[0] ^ inf_bits[2] ^ inf_bits[3];
+    int syndrome3 = par_bits[2] ^ inf_bits[1] ^ inf_bits[2] ^ inf_bits[3];
 
 
-    int sum = s1 + (s2 * 2) + (s3 * 4);
-    //cout << sum << endl;
+    int sum = syndrome1 + (syndrome2 * 2) + (syndrome3 * 4);
+
     if (sum == 0) {
         cout << "No problem\n";
+        return 0;
     } else {
         cout << sum << " digit is wrong\n";
         double check = log2(sum);
         if (check == ceil(check)) {
-            cout << check + 1 << " parity bit is wrong.\n";
-            cout << check + 1 << " parity bit is equal to " << r[check] << endl;
-            cout << "this bit must be equal " << !r[check] << endl;
+            wrong_par_bit(check + 1, par_bits);
         } else {
-            int idx;
+            int index;
             if (sum == 3)
-                idx = 1;
+                index = 1;
             else
-                idx = sum - 3;
-            cout << idx << " information bit is wrong\n";
-            cout << idx << " information bit is equal to " << inf[idx - 1] << endl;
-            cout << "this bit must be equal " << !inf[idx - 1] << endl;
+                index = sum - 3;
+            wrong_inf_bit(index, inf_bits);
         }
-        v[sum - 1] = !v[sum - 1];
+        message[sum - 1] = !message[sum - 1];
     }
 
     cout << "right message is ";
-    for (int i = 0; i < v.size(); i++) {
-        cout << v[i];
+    for (int i = 0; i < message.size(); i++) {
+        cout << message[i];
     }
     cout << endl;
 
