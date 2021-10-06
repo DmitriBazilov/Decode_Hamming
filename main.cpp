@@ -2,11 +2,15 @@
 
 using namespace std;
 
+//Считывание сообщения
+
 string read_message() {
     string s;
     getline(cin, s);
     return s;
 }
+
+//Проверка строки на правильность
 
 bool check_string(string& s) {
     for (int i = 0; i < s.size(); i++) {
@@ -27,6 +31,8 @@ bool check_string(string& s) {
     return 1;
 }
 
+// Вывод и исправление неправильных битов
+
 void wrong_par_bit(int bit_index, vector<int>& par_arr) {
     cout << bit_index << " parity bit is wrong\n";
     cout << bit_index << " parity bit is equal to " << par_arr[bit_index] << endl;
@@ -41,7 +47,6 @@ void wrong_inf_bit(int bit_index, vector<int>& inf_arr) {
 
 int main()
 {
-    int n;
     vector<int> par_bits, inf_bits, message;
 
     string mes;
@@ -56,6 +61,7 @@ int main()
         cout << '\n';
     }
 
+    //Разделение информационных и проверочных битов
     for (int i = 0; i < mes.size(); i++) {
         int number = int(mes[i] - '0');
 
@@ -75,9 +81,10 @@ int main()
     int syndrome1 = par_bits[0] ^ inf_bits[0] ^ inf_bits[1] ^ inf_bits[3];
     int syndrome2 = par_bits[1] ^ inf_bits[0] ^ inf_bits[2] ^ inf_bits[3];
     int syndrome3 = par_bits[2] ^ inf_bits[1] ^ inf_bits[2] ^ inf_bits[3];
-
-
+    
     int sum = syndrome1 + (syndrome2 * 2) + (syndrome3 * 4);
+    
+    // Определение ошибки
 
     if (sum == 0) {
         cout << "No problem\n";
@@ -97,6 +104,8 @@ int main()
         }
         message[sum - 1] = !message[sum - 1];
     }
+    
+    //Вывод правильного сообщения
 
     cout << "right message is ";
     for (int i = 0; i < message.size(); i++) {
